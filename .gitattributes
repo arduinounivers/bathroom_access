@@ -1,2 +1,53 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+/*arduinounivers@gmail.com*/
+#include <EEPROM.h>
+
+int senzor1 = 2;
+int senzor2 = 3;
+int led = 13;
+int buf = 0;
+int val_1 = 0;
+int val_2 = 0;
+
+void setup() {
+  for (int i = 0; i < 512; i++)
+    EEPROM.write(i, 0); 
+    
+  pinMode(senzor1, INPUT);
+  pinMode(senzor2, INPUT);
+  pinMode(led, OUTPUT);
+  Serial.begin(115200);  
+  digitalWrite(led, LOW);
+  attachInterrupt(digitalPinToInterrupt(senzor1),senzor_1,RISING); 
+  attachInterrupt(digitalPinToInterrupt(senzor2),senzor_2,RISING); 
+}
+void loop() {  
+  val_1 = EEPROM.read(1);
+  val_2 = EEPROM.read(2);
+  if ((val_1 == 1) && (val_2 == 1)) {            
+      digitalWrite(led, HIGH);
+  }   
+  if ((val_1 == 0) && (val_2 == 0)) {
+    delay(2000);
+      digitalWrite(led, LOW);
+  }      
+}
+void senzor_1() { 
+    val_1 = EEPROM.read(1);
+  if (val_1 == 0){
+    EEPROM.write(1,1);
+
+  }
+  else{
+    EEPROM.write(1,0);
+    val_1 = EEPROM.read(1);
+  }  
+}
+void senzor_2() {
+    val_2 = EEPROM.read(2);
+  if (val_2 == 0){
+    EEPROM.write(2,1); 
+  }  
+  else{ 
+    EEPROM.update(2,0);   
+  }  
+}
